@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; }
+        header { 
+            background:white; padding:10px 15px; display:flex; align-items:center; 
+            justify-content:space-between; box-shadow:0 2px 8px rgba(0,0,0,0.1); position:sticky; top:0;
+        }
+        .logo { font-size:32px; color:#1877f2; font-weight:bold; }
+        .main { display:flex; max-width:1200px; margin:15px auto; gap:15px; }
+        .feed { flex:1; max-width:600px; }
+        .post, .create-post { 
+            background:white; margin-bottom:15px; border-radius:12px; 
+            padding:15px; box-shadow:0 1px 6px rgba(0,0,0,0.1);
+        }
+        .profile-pic { 
+            width:50px; height:50px; border-radius:50%; object-fit:cover; 
+            border:3px solid #ff2d55; 
+        }
+        img, video { width:100%; border-radius:10px; margin:10px 0; }
+        .name { font-weight:bold; color:#000; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">facebook</div>
+    <input type="text" placeholder="🔍 Search" style="width:45%; padding:12px; border-radius:30px; border:1px solid #ddd;">
+</header>
+
+<div class="main">
+    <div class="feed">
+
+        <!-- পোস্ট তৈরি -->
+        <div class="create-post">
+            <h4>কী ভাবছেন?</h4>
+            <textarea id="postText" rows="3" placeholder="আজ কি শেয়ার করবেন..."></textarea>
+            <input type="file" id="uploadFile" accept="image/*,video/*">
+            <button onclick="createPost()" style="background:#1877f2; color:white; padding:12px 30px; border:none; border-radius:8px; margin-top:10px;">
+                পোস্ট করুন
+            </button>
+        </div>
+
+        <div id="feed"></div>
+    </div>
+</div>
+
+<script>
+// তোমার তিনটা হট ছবি (একই ফোল্ডারে রাখো)
+const hotPics = [
+    "wife.jpg",      // প্রথম ছবি
+    "girl1.jpg",     // দ্বিতীয় ছবি
+    "girl2.jpg"      // তৃতীয় ছবি
+];
+
+const names = ["Riya Khan", "Priya Sharma", "Sonia Roy", "Nadia Islam", "Tania Ahmed", "Mona Khan", "Sara Khan"];
+
+let posts = [];
+
+function createPost() {
+    const text = document.getElementById('postText').value.trim();
+    const fileInput = document.getElementById('uploadFile');
+
+    const randomPic = hotPics[Math.floor(Math.random() * hotPics.length)];
+    const randomName = names[Math.floor(Math.random() * names.length)];
+
+    const post = {
+        id: Date.now(),
+        name: randomName,
+        profilePic: randomPic,
+        text: text || "🔥 Hot moment...",
+        likes: Math.floor(Math.random() * 1200) + 100,
+        fileURL: fileInput.files[0] ? URL.createObjectURL(fileInput.files[0]) : null,
+        fileType: fileInput.files[0] ? (fileInput.files[0].type.startsWith('video') ? 'video' : 'image') : null
+    };
+
+    posts.unshift(post);
+    renderFeed();
+
+    document.getElementById('postText').value = '';
+    fileInput.value = '';
+}
+
+function renderFeed() {
+    const feed = document.getElementById('feed');
+    feed.innerHTML = '';
+
+    posts.forEach(post => {
+        let media = '';
+        if (post.fileURL) {
+            media = post.fileType === 'video' ? 
+                `<video controls><source src="${post.fileURL}"></video>` : 
+                `<img src="${post.fileURL}">`;
+        }
+
+        const html = `
+            <div class="post">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <img src="${post.profilePic}" class="profile-pic">
+                    <div>
+                        <div class="name">${post.name}</div>
+                        <small>এখনই • 🌍</small>
+                    </div>
+                </div>
+                <p>${post.text}</p>
+                ${media}
+                <div style="margin-top:12px; color:#65676b; font-weight:bold;">
+                    ❤️ ${post.likes} জন লাইক করেছে
+                </div>
+            </div>
+        `;
+        feed.innerHTML += html;
+    });
+}
+
+// প্রথমবার কিছু ডেমো পোস্ট
+window.onload = () => {
+    for(let i = 0; i < 5; i++) {
+        createPost();
+    }
+};
+</script>
+
+</body>
+</html>
